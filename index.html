@@ -19,12 +19,12 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Accueil</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/">Blog</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#!">Formation (À venir)</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/About.html">À Propos</a></li>
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Accueil</a></li>
+                        <!--<li class="nav-item"><a class="nav-link" href="/Blog.html">Blog</a></li>-->
+                        <!--<li class="nav-item"><a class="nav-link" href="/Formation.html">Formation (À venir)</a></li>-->
+                        <!--<li class="nav-item"><a class="nav-link" href="/About.html">À Propos</a></li>-->
                         <li class="nav-item"><a class="nav-link" href="/Contact.html">Contactez-nous</a></li>
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/En/index.html"><b>English</b></a></li>
+                        <li class="nav-item"><a class="nav-link active" href="#" onclick="document.location = '/en'+document.location.pathname+document.location.hash"><b>English</b></a></li>
                     </ul>
                 </div>
             </div>
@@ -45,12 +45,12 @@
                 <div class="col-lg-8">
                     <!-- Featured blog post-->
                     <div class="card mb-4">
-                        <a href="#!"><img class="card-img-top" src="/assets/logo_Qwerty_security.png" alt="..." /></a>
+                        <a href="#!"><img class="card-img-top" src="/assets/CVE-2021-24108.PNG" alt="..." /></a>
                         <div class="card-body">
-                            <div class="small text-muted">January 1, 2021</div>
-                            <h2 class="card-title">Featured Post Title</h2>
-                            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reiciendis aliquid atque, nulla? Quos cum ex quis soluta, a laboriosam. Dicta expedita corporis animi vero voluptate voluptatibus possimus, veniam magni quis!</p>
-                            <a class="btn btn-primary" href="#!">Read more →</a>
+                            <div class="small text-muted">January 10, 2022</div>
+                            <h2 class="card-title">CVE-2021-24108</h2>
+                            <p class="card-text">Écriture arbitraire de lien avec office menant à de l'execution et de la persistance</p>
+                            <a class="btn btn-primary" href="/blog/CVE-2021-24108.html">En lire plus →</a>
                         </div>
                     </div>
                     <!-- Nested row for non-featured blog posts-->
