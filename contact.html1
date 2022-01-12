@@ -20,10 +20,10 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Accueil</a></li>
-                        <!--<li class="nav-item"><a class="nav-link" href="/Blog.html">Blog</a></li>-->
-                        <!--<li class="nav-item"><a class="nav-link" href="/Formation.html">Formation (À venir)</a></li>-->
-                        <!--li class="nav-item"><a class="nav-link" href="/About.html">À Propos</a></li>-->
-                        <li class="nav-item"><a class="nav-link" href="/Contact.html">Contactez-nous</a></li>
+                        <!--<li class="nav-item"><a class="nav-link" href="/blog.html">Blog</a></li>-->
+                        <!--<li class="nav-item"><a class="nav-link" href="/formation.html">Formation (À venir)</a></li>-->
+                        <!--li class="nav-item"><a class="nav-link" href="/about.html">À Propos</a></li>-->
+                        <li class="nav-item"><a class="nav-link" href="/contact.html">Contactez-nous</a></li>
                         <!--<li class="nav-item"><a class="nav-link active" href="#" onclick="document.location = '/en'+document.location.pathname+document.location.hash"><b>English</b></a></li>-->
                     </ul>
                 </div>

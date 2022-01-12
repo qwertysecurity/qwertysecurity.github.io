@@ -12,6 +12,6 @@
         <link href="css/styles.css" rel="stylesheet" />
     </head>
     <body>
-<script>document.location = "./Contact.html"</script>
+<script>document.location = "./contact.html"</script>
     </body>
 </html>
