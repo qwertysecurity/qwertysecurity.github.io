@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
+<html><head>
   <meta charset="utf-8">
   <title>Felix Boulet's Security Dump</title>
   <style>
@@ -32,10 +30,40 @@
       display: inline-block;
     }
 
-    .wave-letter {
-      display: inline-block;
-      animation: wave 1.5s infinite ease-in-out;
-    }
+.wave-letter {
+  display: inline-block;
+  animation: wave 1.5s infinite ease-in-out;
+  font-weight: bold;
+  font-size: 32px;
+  background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: 800% 100%;
+}
+
+/* Per-letter offsets to fake a continuous gradient */
+.g0  { background-position: 0% 50%; }
+.g1  { background-position: 9% 50%; }
+.g2  { background-position: 18% 50%; }
+.g3  { background-position: 27% 50%; }
+.g4  { background-position: 36% 50%; }
+.g5  { background-position: 45% 50%; }
+.g6  { background-position: 54% 50%; }
+.g7  { background-position: 63% 50%; }
+.g8  { background-position: 72% 50%; }
+.g9  { background-position: 81% 50%; }
+.g10 { background-position: 90% 50%; }
+.g11 { background-position: 100% 50%; }
+
+@keyframes wave {
+  0%   { transform: translateY(0); }
+  25%  { transform: translateY(-6px); }
+  50%  { transform: translateY(0); }
+  75%  { transform: translateY(6px); }
+  100% { transform: translateY(0); }
+}
+
 
     @keyframes wave {
       0%   { transform: translateY(0); }
@@ -60,20 +88,20 @@
   </style>
 </head>
 <body>
-  <h1 class="rainbow">
-    <span class="wave-letter">h</span>
-    <span class="wave-letter">e</span>
-    <span class="wave-letter">l</span>
-    <span class="wave-letter">l</span>
-    <span class="wave-letter">o</span>
-    <span class="wave-letter">&nbsp;</span>
-    <span class="wave-letter">w</span>
-    <span class="wave-letter">o</span>
-    <span class="wave-letter">r</span>
-    <span class="wave-letter">l</span>
-    <span class="wave-letter">d</span>
-    <span class="wave-letter">!</span>
-  </h1>
+  <h1>
+  <span class="wave-letter g0">h</span>
+  <span class="wave-letter g1">e</span>
+  <span class="wave-letter g2">l</span>
+  <span class="wave-letter g3">l</span>
+  <span class="wave-letter g4">o</span>
+  <span class="wave-letter g5">&nbsp;</span>
+  <span class="wave-letter g6">w</span>
+  <span class="wave-letter g7">o</span>
+  <span class="wave-letter g8">r</span>
+  <span class="wave-letter g9">l</span>
+  <span class="wave-letter g10">d</span>
+  <span class="wave-letter g11">!</span>
+</h1>
 
   <p>My name is felix boulet. I'm a security researcher and bug bounty hunter from canada.</p>
   <p>Expect writeups on patched vulnerabilities, bounty tales, and weird security features.</p>
@@ -91,8 +119,7 @@
   <hr>
 
   <p><span class="blink">[under construction] 
-     <pre style="color: orange">
-  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+     </span></p><pre style="color: orange">  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -105,6 +132,7 @@
 ⠀⠀⠀⠉⠙⠻⢿⣿⡀⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠛⢀⣿⡿⠟⠋⠉⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠉⠁⠢⠤⣤⣀⣈⣁⣀⣤⠤⠔⠈⠉⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-     </pre></span></p>
-</body>
-</html>
+     </pre><p></p>
+
+
+</body></html>
