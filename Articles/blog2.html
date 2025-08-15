@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Joplin Desktop: Arbitrary Tag Injection Leading to RCE (CVE-2024-40643)</title>
+  <style>
+        pre {
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre;
+  }
+    body {
+      background-color: #ffffcc;
+      color: black;
+      font-family: monospace;
+      margin: 40px;
+    }
+
+    a {
+      color: blue;
+      }
+    h2 { text-transform: lowercase; }
+    hr { border: 1px dashed #999; }
+
+    .blink {
+      animation: blink 1s step-start infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    h1.rainbow {
+      font-size: 32px;
+      font-weight: bold;
+      background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+      -webkit-background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+
+.wave-letter {
+  display: inline-block;
+  animation: wave 1.5s infinite ease-in-out;
+  font-weight: bold;
+  font-size: 32px;
+  background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-size: 800% 100%;
+}
+
+.g0  { background-position: 0% 50%; }
+.g1  { background-position: 9% 50%; }
+.g2  { background-position: 18% 50%; }
+.g3  { background-position: 27% 50%; }
+.g4  { background-position: 36% 50%; }
+.g5  { background-position: 45% 50%; }
+.g6  { background-position: 54% 50%; }
+.g7  { background-position: 63% 50%; }
+.g8  { background-position: 72% 50%; }
+.g9  { background-position: 81% 50%; }
+.g10 { background-position: 90% 50%; }
+.g11 { background-position: 100% 50%; }
+
+@keyframes wave {
+  0%   { transform: translateY(0); }
+  25%  { transform: translateY(-6px); }
+  50%  { transform: translateY(0); }
+  75%  { transform: translateY(6px); }
+  100% { transform: translateY(0); }
+}
+
+
+    @keyframes wave {
+      0%   { transform: translateY(0); }
+      25%  { transform: translateY(-6px); }
+      50%  { transform: translateY(0); }
+      75%  { transform: translateY(6px); }
+      100% { transform: translateY(0); }
+    }
+
+    .wave-letter:nth-child(1)  { animation-delay: 0s; }
+    .wave-letter:nth-child(2)  { animation-delay: 0.1s; }
+    .wave-letter:nth-child(3)  { animation-delay: 0.2s; }
+    .wave-letter:nth-child(4)  { animation-delay: 0.3s; }
+    .wave-letter:nth-child(5)  { animation-delay: 0.4s; }
+    .wave-letter:nth-child(6)  { animation-delay: 0.5s; }
+    .wave-letter:nth-child(7)  { animation-delay: 0.6s; }
+    .wave-letter:nth-child(8)  { animation-delay: 0.7s; }
+    .wave-letter:nth-child(9)  { animation-delay: 0.8s; }
+    .wave-letter:nth-child(10) { animation-delay: 0.9s; }
+    .wave-letter:nth-child(11) { animation-delay: 1.0s; }
+    .wave-letter:nth-child(12) { animation-delay: 1.1s; }
+
+
+    pre.code-green {
+      background: #000;
+      color: #0f0;
+      padding: 1em;
+      overflow-x: auto;
+      font-family: "Source Code Pro", monospace;
+      border-radius: 4px;
+      margin: 1.5em 0;
+    }
+    pre.code-green code {
+      color: inherit;
+      background: none;
+    }
+  </style>
+</head>
+
+<body class="site">
+  <header class="site-header">
+    <div class="inner">
+      <nav class="site-nav">
+        <a href="https://blog.qwertysecurity.com/">Home</a>
+        <a href="https://www.linkedin.com/in/felix-boulet/">LinkedIn</a>
+      </nav>
+    </div>
+  </header>
+
+
+  <main class="site-main inner">
+    <article class="post">
+      <header class="post-header">
+        <h1 class="post-title">
+          Joplin Desktop: Arbitrary Tag Injection Leading to RCE (CVE-2024-40643)
+        </h1>
+        <p class="post-meta">August 15, 2025 · Vulnerability Write-up</p>
+      </header>
+
+      <div class="post-content">
+        <p>
+          Joplin is a popular open source note-taking app. In versions up to
+          <strong>3.0.14</strong>, a trivial parsing quirk let a malicious note
+          turn into remote code execution on the desktop client. The fix is
+          out in <strong>3.0.15</strong>. Let’s walk through what went wrong.
+        </p>
+
+        <hr />
+
+        <h3>What Was the Risk?</h3>
+        <p>
+          Joplin’s HTML parser treated any “&lt;” followed by a non-letter as
+          plain text, not markup. That gap meant you could sneak in an illegal
+          tag sequence, inject an iframe with a javascript: URL, and reach into
+          Joplin’s Node.js context.
+        </p>
+        <ul>
+          <li>Any note could carry a payload that becomes active when you view it</li>
+          <li>Payload runs in desktop context, so <code>child_process.execSync</code> is available</li>
+          <li>No UI prompt or warning pops up—you just open the note or paste text, that is it</li>
+        </ul>
+
+        <h3>Affected Versions & Patch</h3>
+        <p>
+          The issue was introduced in the 3.0.13 release and fixed in 3.0.15.
+          Any 3.0.14 or earlier desktop client is vulnerable. Upgrading to
+          <strong>3.0.15</strong> or later closes this hole.
+        </p>
+
+        <h3>How the PoC Works</h3>
+        <p>
+          Paste this snippet into a note. With the wonders of automatic preview,
+          Joplin will execute a shell command and pop an alert with your
+          <code>/etc/hosts</code> contents. In a real attack you could read
+          any file or run arbitrary commands.
+        </p>
+
+        <h3>Why It Slipped Through</h3>
+        <p>
+          HTML is flexible, parsing it cleanly is hard.
+        </p>
+
+        <h3>Key Takeaways</h3>
+        <ul>
+          <li>Don’t trust edge cases in your HTML parser</li>
+          <li>Any context that mixes user content with privileged APIs needs a strict tag whitelist</li>
+          <li>Please don't allow <code>child_process</code> to be used in your app...</li>
+        </ul>
+
+        <h3>PoC Snippet</h3>
+        <pre class="code-green"><code>&lt;div&gt;
+  &lt;.a&lt;iframe src=javascript:
+    try {
+      const out = parent.parent.require('child_process')
+        .execSync('cat /etc/hosts');
+      alert(out.toString());
+    } catch(e) {
+      alert(e);
+    }
+  &gt;
+&lt;/div&gt;</code></pre>
+
+        <p>
+          That payload abuses the “illegal tag” trick to break out of the note
+          sandbox. If you’re building any editor or renderer that sinks HTML
+          into a native host, make sure your parser rejects non-letter tags.
+        </p>
+
+        <h3>Wrapping Up</h3>
+        <p>
+          Joplin’s fix arrived quickly and the code is now safe in 3.0.15. This
+          serves as a reminder that small parsing quirks can lead to big trouble
+          when your app bridges web markup and native code.
+        </p>
+
+<footer class="post-footer">
+          <p>
+            Github link to the original vulnerability: <a href="https://github.com/laurent22/joplin/security/advisories/GHSA-g796-3g6g-jmmc">https://github.com/laurent22/joplin/security/advisories/GHSA-g796-3g6g-jmmc</a>
+          </p>
+        </footer>
+      </div>
+    </article>
+  </main>
+<br>
+<footer class="site-footer">
+    <div class="inner">
+      <nav class="site-nav">
+        <a href="https://blog.qwertysecurity.com/">Home</a>
+        <a href="https://www.linkedin.com/in/felix-boulet/">LinkedIn</a>
+      </nav>
+    </div>
+  </footer>
+</body>
