@@ -157,7 +157,7 @@
 
         <h3>What Could Be Stolen?</h3>
         <ul>
-          <li>Any file the app could read: docs, shell configs, credential stores—even your entire user folder</li>
+          <li>Any file the app could read: docs, shell configs, credential stores, even your entire user folder</li>
           <li>Azure refresh tokens with scopes such as <code>offline_access</code>, <code>openid</code>,
             and <code>user_impersonation</code></li>
         </ul>
@@ -196,7 +196,7 @@
 
         <h3>On Bug Bounties and Scope</h3>
         <p>
-          Microsoft marked this out of scope because the app is open source. That’s technically correct, but they’re the sole maintainer and publisher—this isn’t a forgotten community fork.
+          Microsoft marked this out of scope because the app is open source. That’s technically correct, but they’re the sole maintainer and publisher, this isn’t a forgotten community fork.
         </p>
         <p>
           After some back and forth with the team, the Azure bounty scope is now clearer about excluding first-party open source tools like the Azure CLI and PowerShell modules. Shame it was updated only after I’d submitted my report.
@@ -206,17 +206,18 @@
         <h3>Key Lessons</h3>
         <ul>
           <li>Enforce authentication and origin checks on every local RPC interface</li>
-          <li>Don’t assume browser equals trusted—treat web inputs as untrusted data</li>
-          <li>Map your threat model to real-world usage and support lifecycles</li>
-          <li>Vendor trust boundaries don’t always match your own—revalidate assumptions for every tool</li>
+          <li>Treat all web inputs as untrusted data, even in a browser context</li>
+          <li>Map your threat model to real-world usage and product lifecycles</li>
+          <li>Ensure the vendor’s security priorities align with your usage, and revalidate assumptions regularly</li>
         </ul>
 
         <h3>Wrapping Up</h3>
         <p>
-          The patch rolled out quickly, which is great. But the root cause—unauthenticated local
-          control interfaces—is still popping up across tooling. If your app runs alongside the browser
-          and can touch tokens or files, make authentication a hard requirement, even for localhost.
+          The patch rolled out quickly, which is a welcome win. Still, unauthenticated local control interfaces remain a serious risk. If your app exposes an API, even on localhost, require authentication as a non‑negotiable baseline. 
+          Local doesn’t mean safe. 
+          Too bad this did not earn a bounty. Drive-by attacks in 2025 are rare and impactful.
         </p>
+
 
         <h3>Proof.mp4</h3>
           <p>
