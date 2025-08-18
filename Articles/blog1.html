@@ -199,7 +199,8 @@
           Microsoft marked this out of scope because the app is open source. That’s technically correct, but they’re the sole maintainer and publisher, this isn’t a forgotten community fork.
         </p>
         <p>
-          After some back and forth with the team, the Azure bounty scope is now clearer about excluding first-party open source tools like the Azure CLI and PowerShell modules. Shame it was updated only after I’d submitted my report.
+          After some back and forth with the team, the Azure bounty scope is now clearer about excluding first-party open source tools like the Azure CLI and PowerShell modules. 
+          <br>Shame it was updated only after I’d submitted my report.
           <a href="https://www.microsoft.com/en-us/msrc/bounty-microsoft-azure#:~:text=February%2012,%202025">https://www.microsoft.com/en-us/msrc/bounty-microsoft-azure#:~:text=February%2012,%202025</a>
         </p>
 
@@ -241,7 +242,7 @@
 </code></pre>
 
         <h3>Python Server PoC</h3>
-        <pre class="code-green"><code>from http.server import HTTPServer,SimpleHTTPRequestHandler
+        <pre class="code-green"><code><xmp>from http.server import HTTPServer,SimpleHTTPRequestHandler
 import http
 import ssl
 import logging
@@ -407,7 +408,7 @@ sslctx.check_hostname = False # If set to True, only the hostname that matches t
 sslctx.load_cert_chain(certfile='certificate.crt', keyfile="private.key")
 httpd.socket = sslctx.wrap_socket(httpd.socket, server_side=True)
 httpd.serve_forever()
-</code></pre>
+</xmp></code></pre>
 
       </div>
     </article>
