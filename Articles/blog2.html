@@ -19,7 +19,7 @@
     a {
       color: blue;
       }
-    h2 { text-transform: lowercase; }
+    h2 { font-size: 1.2em; text-transform: lowercase; }
     hr { border: 1px dashed #999; }
 
     .blink {
@@ -141,7 +141,7 @@
 
         <hr />
 
-        <h3>What Was the Risk?</h3>
+        <h2>What Was the Risk?</h2>
         <p>
           Joplin’s HTML parser treated any “&lt;” followed by a non-letter as
           plain text, not markup. That gap meant you could sneak in an illegal
@@ -154,14 +154,14 @@
           <li>No UI prompt or warning pops up—you just open the note or paste text, that is it</li>
         </ul>
 
-        <h3>Affected Versions & Patch</h3>
+        <h2>Affected Versions & Patch</h2>
         <p>
           The issue was introduced in the 3.0.13 release and fixed in 3.0.15.
           Any 3.0.14 or earlier desktop client is vulnerable. Upgrading to
           <strong>3.0.15</strong> or later closes this hole.
         </p>
 
-        <h3>How the PoC Works</h3>
+        <h2>How the PoC Works</h2>
         <p>
           Paste this snippet into a note. With the wonders of automatic preview,
           Joplin will execute a shell command and pop an alert with your
@@ -169,19 +169,19 @@
           any file or run arbitrary commands.
         </p>
 
-        <h3>Why It Slipped Through</h3>
+        <h2>Why It Slipped Through</h2>
         <p>
           HTML is flexible, parsing it cleanly is hard.
         </p>
 
-        <h3>Key Takeaways</h3>
+        <h2>Key Takeaways</h2>
         <ul>
           <li>Don’t trust edge cases in your HTML parser</li>
           <li>Any context that mixes user content with privileged APIs needs a strict tag whitelist</li>
           <li>Please don't allow <code>child_process</code> to be used in your app...</li>
         </ul>
 
-        <h3>PoC Snippet</h3>
+        <h2>PoC Snippet</h2>
         <pre class="code-green"><code>&lt;div&gt;
   &lt;.a&lt;iframe src=javascript:
     try {
@@ -200,7 +200,7 @@
           into a native host, make sure your parser rejects non-letter tags.
         </p>
 
-        <h3>Wrapping Up</h3>
+        <h2>Wrapping Up</h2>
         <p>
           Joplin’s fix arrived quickly and the code is now safe in 3.0.15. This
           serves as a reminder that small parsing quirks can lead to big trouble
