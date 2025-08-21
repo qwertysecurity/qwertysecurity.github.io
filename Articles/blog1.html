@@ -136,7 +136,7 @@
 
         <p>
   <span>When I realized there’d be no paycheck for this research, I figured I might as well earn some street cred instead. It started with a hunch: local developer tools can quietly widen your attack surface. Azure Batch Explorer, a desktop app from Microsoft for managing Azure Batch resources, was a case in point.</span>
-  <span>Versions up to <strong>2.21.0.1069</strong> opened a WebSocket on 127.0.0.1 with no origin checks, CORS enforcement, or authentication, any webpage you visited could talk straight to it.</span>
+  <span>Versions up to <strong>2.21.0.1069</strong> opened a WebSocket on 127.0.0.1 with no origin checks, CORS enforcement, or authentication. Any webpage you visited could talk straight to it.</span>
   <span>The fix is out now so let’s unpack what went wrong and why it matters.</span>
 </p>
         <hr />
@@ -157,7 +157,7 @@
 
         <h2>What Could Be Stolen?</h2>
         <ul>
-          <li>Any file the app could read: docs, shell configs, credential stores, even your entire user folder</li>
+          <li>Any file the app could read: shell configs, credential stores, even your entire user folder</li>
           <li>Azure refresh tokens with scopes such as <code>offline_access</code>, <code>openid</code>,
             and <code>user_impersonation</code></li>
         </ul>
@@ -187,7 +187,7 @@
         <ul>
           <li>A local WebSocket server with no origin validation</li>
           <li>No authentication or permission checks on JSON-RPC methods</li>
-          <li>Blind trust in user-supplied URLs</li>
+          <li>Unvalidated user supplied inputs, such as the URLs</li>
         </ul>
         <p>
           Even top-tier vendors can slip up on basic trust boundaries when they assume <code>localhost</code>
@@ -196,7 +196,7 @@
 
         <h2>On Bug Bounties and Scope</h2>
         <p>
-          <span>Microsoft marked this out of scope because the app is open source. That’s technically correct, but they’re the sole maintainer and publisher, this isn’t a forgotten community fork, or community maintained.</span>
+          <span>Microsoft marked this out of scope because the app is open source. That’s technically correct, but they’re the sole maintainer and publisher, this isn’t a forgotten community fork or community maintained.</span>
           <span>After some back and forth with the team, the Azure bounty scope is now clearer about excluding first-party open source tools like the Azure CLI and PowerShell modules.</span>
           <span>Shame it was updated only after I’d submitted my report.</span>
           <span><a href="https://www.microsoft.com/en-us/msrc/bounty-microsoft-azure#:~:text=February%2012,%202025">https://www.microsoft.com/en-us/msrc/bounty-microsoft-azure#:~:text=February%2012,%202025</a></span>
@@ -214,8 +214,10 @@
         <p>
           <span>The patch rolled out quickly, which is a welcome win. Still, unauthenticated local control interfaces remain a serious risk.</span>
           <span>If your app exposes an API, even on localhost, require authentication as a non‑negotiable baseline.</span>
-          <span>Local doesn’t mean safe.</span>
           <span>Too bad this did not earn a bounty. Drive-by attacks in 2025 are rare and impactful.</span>
+        </p>
+        <p>
+          <span>Please remember, local doesn’t mean safe.</span>
         </p>
 
 
