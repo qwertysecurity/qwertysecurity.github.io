@@ -1,3 +1,8 @@
 title: "Felix Boulet's Blog"
 markdown: kramdown
 theme: null
+plugins:
+  - jekyll-feed
+
+# Tell Jekyll where to find posts
+posts_dir: Articles
