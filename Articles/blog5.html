@@ -127,7 +127,7 @@
         <p>
           <span>Let's quickly cover the basics, OAuth 2.0 allows applications to gain authorized access to resources without ever handling your credentials. You log in via a browser, and the application receives a one-time code when you're redirected back to http://localhost:{port}. Simple.</span>
           <span>Now, consider prompt=none.</span>
-          <span>This OAuth parameter instructs the authorization server to not display a login screen if the user is already authenticated, allowing the application to silently obtain tokens. While useful for seamless user experiences, it introduces a significant attack surface if proper checks aren't rigorously enforced.</span>
+          <span>This OAuth parameter instructs the authorization server to not display a login screen if the user is already authenticated, allowing the application to silently obtain tokens with no interactions. While useful for seamless user experiences, it introduces a significant attack surface if proper checks aren't rigorously enforced.</span>
           <span>The standard authentication flow does include a check for the Chrome Android user agent. However, what happens when you're not using Chrome?</span>
           <span>If you use a browser like Edge, for example (which will prompt you to authenticate to M365 by default), you could effectively bypass this user agent check and an attacker could intercept the authentication token.</span>
         </p>
@@ -145,7 +145,7 @@
           <li>A small JavaScript payload on the app controlled localhost page or raw socket captures this code and transmits it back to a attacker controlled server.</li>
         </ol>
          <p>
-          <span>Zero user interaction was required. You never saw a login page, nor did you enter credentials. And now you're account is 100% compromised.</span>
+          <span>Zero user interaction was required. You never saw a login page, nor did you enter credentials. And now an attacker has a valid authentication token, giving them privileged access to your account and to do any action you could, read data, write data, even delete everything if you have this access.</span>
         </p>
 
 
