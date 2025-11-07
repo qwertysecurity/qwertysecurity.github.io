@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Unseen Threat: How a Default Browser Choice on Android Leads to Auth Bypass</title>
+  <style>
+    pre {
+      font-family: 'Courier New', Courier, monospace;
+      white-space: pre;
+    }
+    body {
+      background-color: #ffffcc;
+      color: black;
+      font-family: monospace;
+      margin: 40px;
+    }
+    a {
+      color: blue;
+    }
+    h2 { font-size: 1.2em; text-transform: lowercase; }
+    hr { border: 1px dashed #999; }
+    .blink {
+      animation: blink 1s step-start infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    h1.rainbow {
+      font-size: 32px;
+      font-weight: bold;
+      background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+      -webkit-background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+    .wave-letter {
+      display: inline-block;
+      animation: wave 1.5s infinite ease-in-out;
+      font-weight: bold;
+      font-size: 32px;
+      background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      background-size: 800% 100%;
+    }
+    .g0  { background-position: 0% 50%; }
+    .g1  { background-position: 9% 50%; }
+    .g2  { background-position: 18% 50%; }
+    .g3  { background-position: 27% 50%; }
+    .g4  { background-position: 36% 50%; }
+    .g5  { background-position: 45% 50%; }
+    .g6  { background-position: 54% 50%; }
+    .g7  { background-position: 63% 50%; }
+    .g8  { background-position: 72% 50%; }
+    .g9  { background-position: 81% 50%; }
+    .g10 { background-position: 90% 50%; }
+    .g11 { background-position: 100% 50%; }
+    @keyframes wave {
+      0%   { transform: translateY(0); }
+      25%  { transform: translateY(-6px); }
+      50%  { transform: translateY(0); }
+      75%  { transform: translateY(6px); }
+      100% { transform: translateY(0); }
+    }
+    .wave-letter:nth-child(1)  { animation-delay: 0s; }
+    .wave-letter:nth-child(2)  { animation-delay: 0.1s; }
+    .wave-letter:nth-child(3)  { animation-delay: 0.2s; }
+    .wave-letter:nth-child(4)  { animation-delay: 0.3s; }
+    .wave-letter:nth-child(5)  { animation-delay: 0.4s; }
+    .wave-letter:nth-child(6)  { animation-delay: 0.5s; }
+    .wave-letter:nth-child(7)  { animation-delay: 0.6s; }
+    .wave-letter:nth-child(8)  { animation-delay: 0.7s; }
+    .wave-letter:nth-child(9)  { animation-delay: 0.8s; }
+    .wave-letter:nth-child(10) { animation-delay: 0.9s; }
+    .wave-letter:nth-child(11) { animation-delay: 1.0s; }
+    .wave-letter:nth-child(12) { animation-delay: 1.1s; }
+    pre.code-green {
+      background: #000;
+      color: #0f0;
+      padding: 1em;
+      overflow-x: auto;
+      font-family: "Source Code Pro", monospace;
+      border-radius: 4px;
+      margin: 1.5em 0;
+    }
+    pre.code-green code {
+      color: inherit;
+      background: none;
+    }
+    p span {
+      display: block;
+    }
+  </style>
+</head>
+
+<body class="site">
+  <header class="site-header">
+    <div class="inner">
+      <nav class="site-nav">
+        <a href="https://blog.qwertysecurity.com/">Home</a>
+        <a href="https://www.linkedin.com/in/felix-boulet/">LinkedIn</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main inner">
+    <article class="post">
+      <header class="post-header">
+        <h1 class="post-title">
+          The Unseen Threat: How a Default Browser Choice on Android Leads to Auth Bypass
+        </h1>
+        <p class="post-meta"><b>November 7, 2025 - Vulnerability Write-up</b></p>
+      </header>
+      <div class="post-content">
+
+        <p>
+          <span>This isn't a zero-day vulnerability hidden deep in kernel internals.</span>
+          <span>Instead, it's a silent OAuth bypass triggered by a seemingly innocuous detail, having a non-Chrome browser set as your default for M365 on Android.</span>
+          <span>If you're using browsers like Edge or Firefox, this could have affected you.</span>
+        </p>
+
+        <hr />
+
+        <h2>The Prerequisites</h2>
+        <p>
+          <span>Let's quickly cover the basics, OAuth 2.0 allows applications to gain authorized access to resources without ever handling your credentials. You log in via a browser, and the application receives a one-time code when you're redirected back to http://localhost:{port}. Simple.</span>
+          <span>Now, consider prompt=none.</span>
+          <span>This OAuth parameter instructs the authorization server to not display a login screen if the user is already authenticated, allowing the application to silently obtain tokens. While useful for seamless user experiences, it introduces a significant attack surface if proper checks aren't rigorously enforced.</span>
+          <span>The standard authentication flow does include a check for the Chrome Android user agent. However, what happens when you're not using Chrome?</span>
+          <span>If you use a browser like Edge, for example (which will prompt you to authenticate to M365 by default), you could effectively bypass this user agent check and an attacker could intercept the authentication token.</span>
+        </p>
+
+        <h2>The Exploitation</h2>
+        <p>
+          <span>Here’s how this vulnerability could have been exploited:</span>
+        </p>
+        <ol>
+          <li>You are logged in to M365 in any browser except Chrome as your default on Android (e.g., Edge).</li>
+          <li>An app with malicious intent is installed on your phone (either sideloaded or disguised as legitimate).</li>
+          <li>That app initiates an OAuth request using a Microsoft client_id that trust localhost as a redirect such as 04b07795-8ddb-461a-bbee-02f9e1bf7b46 (Microsoft Azure CLI) or fb78d390-0c51-40cd-8e17-fdbfab77341b (Exchange REST API), and sets the redirect_uri to http://localhost, with the prompt=none parameter included.</li>
+          <li>If Edge is installed, the attacker can force the request through the Edge app using the microsoft-edge:// scheme, effectively piggybacking on your existing authenticated session.</li>
+          <li>The browser silently redirects to localhost with an authentication code in the URL.</li>
+          <li>A small JavaScript payload on the app controlled localhost page or raw socket captures this code and transmits it back to a attacker controlled server.</li>
+        </ol>
+         <p>
+          <span>Zero user interaction was required. You never saw a login page, nor did you enter credentials. And now you're account is 100% compromised.</span>
+        </p>
+
+
+        <h2>Disclosure and Remediation</h2>
+        <p>
+          <span>This vulnerability was reported to the Microsoft Security Response Center (MSRC) in early 2025.</span>
+          <span>After a few hiccups and an initial "out of scope" classification, I was able to make my case heard, and the report was reopened for a fix. Following this detailed second review, MSRC identified and remediated the underlying vulnerability in the authentication flow. The fix was confirmed and deployed on October 8, 2025.</span>
+          <span>I would like to thank the MSRC team for their investigation, remediation, and for the bounty awarded for this finding.</span>
+        </p>
+
+
+        <h2>Key Lessons</h2>
+        <span>If you're building mobile authentication flows, here’s what needs to change:</span>
+        <ul>
+          <li>Never trust untrusted redirects. Do not allow redirection to a non-HTTPS, untrusted URI without explicit user interaction.</li>
+          <li>Disallow prompt=none for localhost. Force user interaction for localhost redirects, especially if they are unauthenticated.</li>
+          <li>Validate redirect URIs rigorously. Treat redirect URI validation as a critical security control, as your tokens depend on it.</li>
+        </ul>
+
+        <h2>Proof.mp4</h2>
+          <p>
+            <details>
+              <summary style="cursor: pointer; font-weight: bold; color: blue; text-decoration: underline;">
+                <a href=#videopoc>Click me for proof</a>
+              </summary>
+              <p id=videopoc >
+              <br>
+                <video style="width: 75%; height: auto;" muted autoplay controls>
+                  <source src="/Proofs/blog5/poc.mp4" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              </p>
+            </details>
+          </p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="inner">
+      <nav class="site-nav">
+        <a href="https://blog.qwertysecurity.com/">Home</a>
+        <a href="https://www.linkedin.com/in/felix-boulet/">LinkedIn</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
